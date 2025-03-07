@@ -14,7 +14,6 @@ def polynomial(x, args):
     return y
 
 def bisect(func, a, b, eps):
-    x0 = (a + b) / 2
     while abs(a - b) > eps:
         x0 = (a + b) / 2
         if func(x0) * func(a) < 0:
