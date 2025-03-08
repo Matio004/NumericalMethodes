@@ -13,7 +13,7 @@ print(
 choice = int(input('Wybór: '))
 match choice:
     case 0:
-        func =
+        func = 0
     case 1:
         func = sin
     case 2:
