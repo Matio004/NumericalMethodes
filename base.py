@@ -13,6 +13,18 @@ def polynomial(x, args):
         y = y*x + i
     return y
 
+def exponential(x, a):
+    temp = 1
+    for _ in range(x):
+        temp *= a
+    return temp
+
+def zlozenie(x, functions):
+    for func in reversed(functions):
+        x = func(x)
+    return x
+
+
 def bisect(func, a, b, eps = None, max_iter = None):
     steps = 0
     while (abs(a - b) > eps) if max_iter is None else max_iter > steps:
