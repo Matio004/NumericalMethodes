@@ -5,7 +5,7 @@ from base import *
 
 print(
 '''Wybierz funkcję:
-0. Wielomian
+0. Wielomian 2x^5-4x^4+3x^3-6x^2+5x+1
 1. Trygonometryczna
 2. Wykładnicza 
 3. Złożenie funkcji'''
@@ -13,7 +13,7 @@ print(
 choice = int(input('Wybór: '))
 match choice:
     case 0:
-        func = 0
+        func = None
     case 1:
         func = sin
     case 2:
