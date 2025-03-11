@@ -45,5 +45,7 @@ def newton(func, derivative, a, b, eps = None, max_iter = None):
         steps += 1
         x_i1, x_i = x_i - func(x_i)/derivative(x_i), x_i1
     return x_i1, steps
-print(bisect(lambda x: polynomial(x, [1.,2.,-2.]), -6., -2., 1e-10))
-print(newton(lambda x: polynomial(x, [1.,2.,-2.]), lambda x: polynomial(x, [2.,2.]), -6., -2., .0000000001))
+
+if __name__ == '__main__':
+    print(bisect(lambda x: polynomial(x, [1.,2.,-2.]), -6., -2., 1e-10))
+    print(newton(lambda x: polynomial(x, [1.,2.,-2.]), lambda x: polynomial(x, [2.,2.]), -6., -2., .0000000001))
