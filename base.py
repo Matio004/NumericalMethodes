@@ -19,11 +19,6 @@ def exponential(x, a):
         temp *= a
     return temp
 
-def zlozenie(x, functions):
-    for func in reversed(functions):
-        x = func(x)
-    return x
-
 
 def bisect(func, a, b, eps = None, max_iter = None):
     steps = 0
