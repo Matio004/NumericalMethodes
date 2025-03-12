@@ -62,7 +62,11 @@ print(bisection_result)
 print(newton_results)
 
 #TODO rysunek rozw.
+#todo osie, analityczne, ticks
 ax = sns.lineplot(x=x, y=y)
-sns.scatterplot(x=[bisection_result[0]], y=[0], ax=ax, facecolor='None', edgecolor='#0000FF')
-sns.scatterplot(x=[newton_results[0]], y=[0], ax=ax, marker='s', facecolor='None', edgecolor='#ff0000')
+sns.scatterplot(x=[bisection_result[0]], y=[0], ax=ax, facecolor='None',
+                edgecolor='#0000FF', label=f'Wynik bisekcji: {bisection_result[0]}')
+sns.scatterplot(x=[newton_results[0]], y=[0], ax=ax, marker='s', facecolor='None',
+                edgecolor='#ff0000', label=f'Wynik metody stycznych: {newton_results[0]}')
+ax.legend()
 plt.show()
