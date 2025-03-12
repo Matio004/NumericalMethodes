@@ -37,6 +37,7 @@ match choice:
 y = list(map(func, x))
 
 plt.plot(x, y)
+plt.grid()
 plt.show()
 
 
