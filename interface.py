@@ -34,8 +34,12 @@ match choice:
         func = lambda x: polynomial(sin(x), [1, 1, 0])
         d_func = lambda x: (2*sin(x) + 1) * cos(x)
         x = numpy.arange(-6, 8, .1)
-        analytical_zeroes = [(numpy.pi * k) + ((3/2) * numpy.pi) for k in range(int(x.min()), int(x.max()) + 1)
-                             + (2* k *numpy.pi  for k in range(int(x.min()), int(x.max()) + 1))]
+        analytical_zeroes = (
+            [(2 * numpy.pi * k) + ((3 / 2) * numpy.pi) for k in range(int(x.min()), int(x.max()) + 1)]
+            + [(2 * numpy.pi * k) + ((-1 / 2) * numpy.pi) for k in range(int(x.min()), int(x.max()) + 1)]
+            + [k * numpy.pi for k in range(int(x.min()), int(x.max()) + 1)]
+        )
+
     case _:
         pass
 
