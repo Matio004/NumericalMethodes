@@ -69,4 +69,5 @@ sns.scatterplot(x=[bisection_result[0]], y=[0], ax=ax, facecolor='None',
 sns.scatterplot(x=[newton_results[0]], y=[0], ax=ax, marker='s', facecolor='None',
                 edgecolor='#ff0000', label=f'Wynik metody stycznych: {newton_results[0]}')
 ax.legend()
+plt.grid()
 plt.show()
