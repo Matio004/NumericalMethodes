@@ -10,7 +10,7 @@ print(
 0. Wielomian: y = x^3 + x^2 - 2x
 1. Trygonometryczna: y = sin(x) + cos(x)
 2. Wykładnicza: y = 2^x - 2
-3. Złożenie funkcji: y = sin(x)^2 + sin(x)'''
+3. Złożenie dwóch funkcji f(g(x))'''
 )
 choice = int(input('Wybór: '))
 analytical_zeroes = []
@@ -31,17 +31,41 @@ match choice:
         x = numpy.arange(-10, 8, .1)
         analytical_zeroes = [1]
     case 3:
-        func = lambda x: polynomial(sin(x), [1, 1, 0])
-        d_func = lambda x: (2*sin(x) + 1) * cos(x)
-        x = numpy.arange(-6, 8, .1)
-        analytical_zeroes = (
-            [(2 * numpy.pi * k) + ((3 / 2) * numpy.pi) for k in range(int(x.min()), int(x.max()) + 1)]
-            + [(2 * numpy.pi * k) + ((-1 / 2) * numpy.pi) for k in range(int(x.min()), int(x.max()) + 1)]
-            + [k * numpy.pi for k in range(int(x.min()), int(x.max()) + 1)]
+        print("Wybierz funkcję zewnętrzną f: \n0. Wielomian: y = x^3 + x^2 - 2x\n1. Trygonometryczna: y = sin(x) + cos(x)"
+              "\n2. Wykładnicza: y = 2^x - 2"
         )
+        choice2 = int(input('Wybór: '))
+        match choice2:
+            case 0:
+                f = lambda x: polynomial(x, [1, 1, -2, 0])
+                d_f = lambda x: polynomial(x, [3, 2, -2])
+            case 1:
+                f = lambda x: sin(x) + cos(x)
+                d_f = lambda x: cos(x) - sin(x)
+            case 2:
+                f = lambda x: pow(2, x) - 2
+                d_f = lambda x: pow(2, x) * log(2)
+        print(
+            "Wybierz funkcję wewnętrzną g: \n0. Wielomian: y = x^3 + x^2 - 2x\n1. Trygonometryczna: y = sin(x) + cos(x)"
+            "\n2. Wykładnicza: y = 2^x - 2"
+        )
+        choice3 = int(input('Wybór: '))
+        match choice3:
+            case 0:
+                g = lambda x: polynomial(x, [1, 1, -2, 0])
+                d_g = lambda x: polynomial(x, [3, 2, -2])
+            case 1:
+                g = lambda x: sin(x) + cos(x)
+                d_g = lambda x: cos(x) - sin(x)
+            case 2:
+                g = lambda x: pow(2, x) - 2
+                d_g = lambda x: pow(2, x) * log(2)
 
+        func = lambda x: f(g(x))
+        d_func = lambda x: d_f(g(x)) * d_g(x)
+        x = numpy.arange(-5, 5, .1)
     case _:
-        pass
+        print("Podano błędną wartość!")
 
 #TODO wykres
 y = list(map(func, x))
@@ -50,7 +74,8 @@ ax = sns.lineplot(x=x, y=y)
 sns.scatterplot(x=analytical_zeroes, y=[0] * len(analytical_zeroes), ax=ax, marker="D", edgecolor="green",
                 facecolor="None", label="Miejsca zerowe wyznaczone analitycznie")
 plt.xlim(x.min(), x.max())
-ax.legend(loc='upper left')
+if choice != 3:
+    ax.legend(loc='upper left')
 plt.grid()
 plt.show()
 
@@ -80,8 +105,9 @@ print(newton_results)
 #TODO rysunek rozw.
 #todo osie, analityczne, ticks
 ax = sns.lineplot(x=x, y=y)
-sns.scatterplot(x=analytical_zeroes, y=[0] * len(analytical_zeroes), ax=ax, marker="D", edgecolor="green",
-                facecolor="None", label=f"Wynik analityczny: {filtered_zeroes[0]}")
+if(choice != 3):
+    sns.scatterplot(x=analytical_zeroes, y=[0] * len(analytical_zeroes), ax=ax, marker="D", edgecolor="green",
+                    facecolor="None", label=f"Wynik analityczny: {filtered_zeroes[0]}")
 plt.xlim(a, b)
 plt.ylim(func(a),func(b))
 sns.scatterplot(x=[bisection_result[0]], y=[0], ax=ax, facecolor='None',
