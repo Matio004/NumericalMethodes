@@ -1,3 +1,5 @@
+import math
+
 import matplotlib.pyplot as plt
 import numpy
 import seaborn as sns
@@ -21,7 +23,7 @@ match choice:
     case 1:
         func = lambda x: sin(x) + cos(x)
         d_func = lambda x: cos(x) - sin(x)
-        x = numpy.arange(-10, 12, .1)
+        x = numpy.arange(-2*math.pi, 2*math.pi, .1)
     case 2:
         func = lambda x: pow(2, x) - 2
         d_func = lambda x: pow(2, x) * log(2)
