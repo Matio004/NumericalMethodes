@@ -32,14 +32,11 @@ def newton(func, derivative, a, b, eps = None, max_iter = None):
     if func(a) * func(b) > 0:
         raise ValueError("Brak przeciwnych znaków funkcji na krańcach badanego przedziału")
 
-    x_i = a
-    x_i1 = b
-
     steps = 0
-    while (abs(x_i - x_i1) > eps) if max_iter is None else max_iter > steps:
+    while (abs(a - b) > eps) if max_iter is None else max_iter > steps:
         steps += 1
-        x_i1, x_i = x_i - func(x_i)/derivative(x_i), x_i1
-    return x_i1, steps, abs(x_i1 - x_i)
+        b, a = a - func(a)/derivative(a), b
+    return b, steps, abs(b - a)
 
 if __name__ == '__main__':
     print(bisect(lambda x: polynomial(x, [1.,2.,-2.]), -6., -2., 1e-10))
