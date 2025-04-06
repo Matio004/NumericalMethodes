@@ -1,8 +1,11 @@
 import numpy
 
 
-def jordan(matrix: numpy.ndarray, b: numpy.ndarray):
-    augmented = numpy.hstack([matrix, b.reshape((-1, 1))])
+def jordan(matrix: numpy.ndarray, b: numpy.ndarray = None):
+    if b is not None:
+        augmented = numpy.hstack([matrix, b.reshape((-1, 1))])
+    else:
+        augmented = matrix
 
     for k in range(matrix.shape[0]):
         if numpy.isclose(augmented[k, k], 0):
@@ -16,26 +19,10 @@ def jordan(matrix: numpy.ndarray, b: numpy.ndarray):
                 else:
                     return 'sprzeczny'
 
-        augmented[k] = augmented[k, k]
+        augmented[k] /= augmented[k, k]
 
         for i in range(matrix.shape[0]):
             if i != k:
                 augmented[i] -= augmented[i, k] * augmented[k]
 
     return augmented[:, -1]
-
-v = numpy.array([
-    [3, 3, 1],
-    [2, 5, 7],
-
-], dtype=numpy.float64)
-print(v)
-print(v[0,2])
-print(v.shape)
-print(len(v))
-x = jordan(numpy.array([
-    [3, 3, 1],
-    [2, 5, 7],
-    [-4, -10, -14]
-], dtype=numpy.float64), numpy.array([1, 20, -40], dtype=numpy.float64))
-print(x)
