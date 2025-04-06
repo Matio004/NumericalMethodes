@@ -18,16 +18,6 @@ def jordan(matrix: numpy.ndarray, b: numpy.ndarray, step_by_step=False):
     new_b = b.copy()
     identity = numpy.eye(matrix.shape[0], dtype=numpy.float64)
     for k in range(len(matrix)):
-        if step_by_step:
-            print(f"\n--- KROK {k + 1} ---")
-            n= matrix.shape[0]
-            combined = numpy.hstack((new_matrix, identity, new_b.reshape(-1, 1)))
-            for row in combined:
-                print("[", end="")
-                print(" ".join(f"{x:7.3f}" for x in row[:n]), end=" | ")
-                print(" ".join(f"{x:7.3f}" for x in row[n:2 * n]), end=" | ")
-                print(f"{row[-1]:7.3f} ]")
-
         if matrix[k][k] != 0:
             identity[k] /= new_matrix[k][k]
             new_b[k] = b[k] / matrix[k][k]
@@ -44,28 +34,21 @@ def jordan(matrix: numpy.ndarray, b: numpy.ndarray, step_by_step=False):
                     new_b[i] = b[i] - (b[k] * matrix[i][k]) / matrix[k][k]
         matrix = new_matrix.copy()
         b = new_b.copy()
-    if step_by_step:
-        print("\n=== MACIERZ KOŃCOWA ===")
-        combined = numpy.hstack((new_matrix, identity, new_b.reshape(-1, 1)))
-        for row in combined:
-            print("[", end="")
-            print(" ".join(f"{x:7.3f}" for x in row[:n]), end=" | ")
-            print(" ".join(f"{x:7.3f}" for x in row[n:2 * n]), end=" | ")
-            print(f"{row[-1]:7.3f} ]")
-
+        if step_by_step:
+            print(f"\n=== KROK {k + 1} ===")
+            n= matrix.shape[0]
+            combined = numpy.hstack((new_matrix, identity, new_b.reshape(-1, 1)))
+            for row in combined:
+                print("[", end="")
+                print(" ".join(f"{x:7.3f}" for x in row[:n]), end=" | ")
+                print(" ".join(f"{x:7.3f}" for x in row[n:2 * n]), end=" | ")
+                print(f"{row[-1]:7.3f} ]")
     return b
 
-def solution(matrix: numpy.ndarray, b: numpy.ndarray):
+def solution(matrix: numpy.ndarray, b: numpy.ndarray, step_by_step=False):
     status = kronecker_capelli(matrix, b)
     if status != 'oznaczony':
         print(f'Układ jest {status}.')
         return None
     else:
-        return jordan(matrix, b, step_by_step=True)
-
-x = solution(numpy.array([
-    [3, 3, 1],
-    [2, 5, 7],
-    [1, 2, 1]
-], dtype=numpy.float64), numpy.array([12, 33, 8], dtype=numpy.float64))
-print(x)
+        return jordan(matrix, b, step_by_step=step_by_step)
