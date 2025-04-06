@@ -39,8 +39,8 @@ def main():
                 display_files()
                 continue
             case "2":
-                filename = input("Podaj nazwę pliku (bez rozszerzenia .układy): ").strip()
-                filename = f"układy/{filename}.układy"
+                filename = input("Podaj nazwę pliku (bez rozszerzenia .txt): ").strip()
+                filename = f"układy/{filename}.txt"
 
                 while True:
                     n = input("Podaj liczbę równań w układzie: ")
