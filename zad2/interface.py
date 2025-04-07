@@ -9,6 +9,10 @@ if __name__ == "__main__":
 
     count_equations = int(input('Podaj liczbę równać w układzie: '))
 
+    if count_equations > 10:
+        print('Maksymalna liczba równań to 10')
+        exit(-1)
+
     if not os.path.exists(path):
         with open(path, 'x') as file:
             file.write('')
