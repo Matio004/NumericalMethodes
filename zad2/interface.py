@@ -22,6 +22,8 @@ if __name__ == "__main__":
 
     equations = numpy.loadtxt(path, numpy.float64, delimiter=' ')
 
+    print('Układ:', equations, sep='\n')
+
     if equations.shape[0] != count_equations:
         print('Podano nieprawidłową liczbę równań!')
         exit(-1)
@@ -29,4 +31,4 @@ if __name__ == "__main__":
         print('Zła zmiennych w równaniu!')
         exit(-1)
 
-    print(jordan(equations))
+    print('Wynik:', jordan(equations))
