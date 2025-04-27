@@ -37,6 +37,8 @@ def main():
     plt.scatter(nodes, f_values, color='black', label='Węzły interpolacji')
     plt.legend()
     plt.grid(True)
+
+    plt.savefig("interpolacja.png")
     plt.show()
 
 if __name__ == "__main__":
