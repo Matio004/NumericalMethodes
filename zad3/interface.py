@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import base
 
-
 functions = {
     'liniowa': lambda x: 2 * x + 1,
-    'modul': lambda x: np.abs(x),
+    '|x|': lambda x: np.abs(x),
     'wielomian': lambda x: x ** 3 - 2 * x + 1,
     'trygonometryczna': lambda x: np.sin(x) + np.cos(x),
-} #todo złożenia
+    'złożenie' : base.composition(lambda x: np.abs(x), lambda x: np.cos(x) - 0.5) #|cos(x) - 0.5|
+}
 
 def main():
     print("Dostępne funkcje:")

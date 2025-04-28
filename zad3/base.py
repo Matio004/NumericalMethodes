@@ -34,3 +34,6 @@ def polyHornerValue(x, nodes, coeffs):
 
 def generateEquallySpacedNodes(a, b, n):
     return np.linspace(a, b, n)
+
+def composition(f,g):
+    return lambda x: f(g(x))
