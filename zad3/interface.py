@@ -2,10 +2,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import base
 
+def wielomian_horner(x):
+    #x^3 - 2x + 1
+    coeffs = [1, 0, -2, 1]
+    result = coeffs[0]
+    for c in coeffs[1:]:
+        result = result * x + c
+    return result
+
 functions = {
     'liniowa': lambda x: 2 * x + 1,
     '|x|': lambda x: np.abs(x),
-    'wielomian': lambda x: x ** 3 - 2 * x + 1,
+    'wielomian': wielomian_horner,
     'trygonometryczna': lambda x: np.sin(x) + np.cos(x),
     'złożenie' : base.composition(lambda x: np.abs(x), lambda x: np.cos(x) - 0.5) #|cos(x) - 0.5|
 }
