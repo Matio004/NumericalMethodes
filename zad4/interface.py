@@ -22,5 +22,7 @@ if __name__ == '__main__':
 
     eps = float(input('Podaj dokładność obliczania całki metodą Newtona Cotesa(np. 1e-6): '))
 
-    print('Wynik otrzymany kwadraturą Newtona-Cotesa:', NumericalIntegration().newton_cotes_adaptive(fun, eps))
-    print('Wynik otrzymany kwadraturą Gausa:', NumericalIntegration().gauss_quadrature(fun, 3))
+    numerical_integration = NumericalIntegration('laguerre.txt')
+    print('Wynik otrzymany kwadraturą Newtona-Cotesa:', numerical_integration.newton_cotes_adaptive(fun, eps))
+    for i in range(2, 6):
+        print(f'Wynik otrzymany kwadraturą Gausa, dla {i}:', numerical_integration.gauss_quadrature(fun, i))

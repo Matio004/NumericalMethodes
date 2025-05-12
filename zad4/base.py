@@ -1,25 +1,49 @@
 import math
+import re
 
+import numpy
 import numpy as np
 from math import exp, sqrt, pi
 
 
 class NumericalIntegration:
-    def __init__(self):
-        # Dla wielomianów Laguerre'a ([0,∞)) z wagą e^(-x)
-        self.laguerre_roots = {
-            2: np.array([2 - sqrt(2), 2 + sqrt(2)]),
-            3: np.array([0.4157745568, 2.2942803603, 6.2899450829]),
-            4: np.array([0.3225476896, 1.7457611012, 4.5366202969, 9.3950709123]),
-            5: np.array([0.2635603197, 1.4134030591, 3.5964257710, 7.0858100059, 12.6408008443])
-        }
+    def __init__(self, filepath):
+        self.laguerre_weights = {}
+        self.laguerre_roots = {}
 
-        self.laguerre_weights = {
-            2: np.array([1 / 2 * (2 + sqrt(2)), 1 / 2 * (2 - sqrt(2))]),
-            3: np.array([0.7110930099, 0.2785177336, 0.0103892565]),
-            4: np.array([0.6031541043, 0.3574186924, 0.0388879085, 0.0005392947]),
-            5: np.array([0.5217556106, 0.3986668110, 0.0759424497, 0.0036117586, 0.0000233700])
-        }
+        # Dla wielomianów Laguerre'a ([0,∞)) z wagą e^(-x)
+        with open(filepath, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+
+        n = None
+        weights = []
+        roots = []
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            match = re.match(r'n\s*=\s*(\d+)', line)
+            if match:
+                if n is not None:
+                    # Zapisz poprzednie dane
+                    self.laguerre_weights[n] = np.array(weights)
+                    self.laguerre_roots[n] = np.array(roots)
+                    weights = []
+                    roots = []
+                n = int(match.group(1))
+            else:
+                parts = line.split()
+                if len(parts) >= 2:
+                    weight = float(parts[0])
+                    root = float(parts[1])
+                    weights.append(weight)
+                    roots.append(root)
+
+        # Zapisz dane dla ostatniego n
+        if n is not None and weights and roots:
+            self.laguerre_weights[n] = np.array(weights)
+            self.laguerre_roots[n] = np.array(roots)
 
     def simpson_rule(self, f, a, b, n):
         """
