@@ -1,9 +1,7 @@
-import math
 import re
 
 import numpy
-import numpy as np
-from math import exp, sqrt, pi
+from math import exp
 
 
 class NumericalIntegration:
@@ -27,8 +25,8 @@ class NumericalIntegration:
             if match:
                 if n is not None:
                     # Zapisz poprzednie dane
-                    self.laguerre_weights[n] = np.array(weights)
-                    self.laguerre_roots[n] = np.array(roots)
+                    self.laguerre_weights[n] = numpy.array(weights)
+                    self.laguerre_roots[n] = numpy.array(roots)
                     weights = []
                     roots = []
                 n = int(match.group(1))
@@ -42,8 +40,8 @@ class NumericalIntegration:
 
         # Zapisz dane dla ostatniego n
         if n is not None and weights and roots:
-            self.laguerre_weights[n] = np.array(weights)
-            self.laguerre_roots[n] = np.array(roots)
+            self.laguerre_weights[n] = numpy.array(weights)
+            self.laguerre_roots[n] = numpy.array(roots)
 
     def simpson_rule(self, f, a, b, n):
         """
@@ -53,8 +51,8 @@ class NumericalIntegration:
             n += 1
 
         h = (b - a) / n
-        x = np.linspace(a, b, n + 1)
-        y = np.array([f(xi) for xi in x])
+        x = numpy.linspace(a, b, n + 1)
+        y = numpy.array([f(xi) for xi in x])
 
         result = y[0] + y[-1]
         result += 4 * sum(y[1:-1:2])
