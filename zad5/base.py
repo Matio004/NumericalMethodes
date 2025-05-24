@@ -1,7 +1,8 @@
 import re
+from fractions import Fraction
 
 import numpy
-from math import exp
+from math import exp, comb, factorial
 
 
 class NumericalIntegration:
@@ -125,3 +126,45 @@ def polynomial(x, args):
     for i in args:
         y = y*x + i
     return y
+
+
+def poly_add(p1, p2):
+    max_len = max(len(p1), len(p2))
+    p1 += [0] * (max_len - len(p1))
+    p2 += [0] * (max_len - len(p2))
+    return [a + b for a, b in zip(p1, p2)]
+
+
+def poly_sub(p1, p2):
+    max_len = max(len(p1), len(p2))
+    p1 += [0] * (max_len - len(p1))
+    p2 += [0] * (max_len - len(p2))
+    return [a - b for a, b in zip(p1, p2)]
+
+
+def poly_mul_scalar(p, scalar):
+    return [coef * scalar for coef in p]
+
+
+def poly_mul_x(p):
+    return [0] + p
+
+
+def laguerre_coeffs(n):
+
+    L0 = [1]  # L_0(x) = 1
+    if n == 0:
+        return L0
+    L1 = [-1, 1]  # L_1(x) = x - 1
+    if n == 1:
+        return L1
+
+    for k in range(1, n):
+        # (x - 2k - 1) * Lk = x * Lk - (2k + 1) * Lk
+        xLk = poly_mul_x(L1)
+        term1 = poly_sub(xLk, poly_mul_scalar(L1, 2 * k + 1))
+        term2 = poly_mul_scalar(L0, k * k)
+        L2 = poly_sub(term1, term2)
+        L0, L1 = L1, L2
+
+    return L1

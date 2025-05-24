@@ -24,5 +24,5 @@ if __name__ == '__main__':
 
     numerical_integration = NumericalIntegration('laguerre.txt')
     print('Wynik otrzymany kwadraturą Newtona-Cotesa:', numerical_integration.newton_cotes_adaptive(fun, eps))
-    for i in range(2, 6):
+    for i in range(2, 11):
         print(f'Wynik otrzymany kwadraturą Gausa, dla {i}:', numerical_integration.gauss_quadrature(fun, i))
