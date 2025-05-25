@@ -1,5 +1,4 @@
 import re
-from fractions import Fraction
 
 import numpy
 from math import exp, comb, factorial
@@ -168,3 +167,60 @@ def laguerre_coeffs(n):
         L0, L1 = L1, L2
 
     return L1
+
+class Approximation:
+    def __init__(self, func, degree, integrator, method='gauss', params=None):
+        self.func = func
+        self.degree = degree
+        self.integrator = integrator
+        self.method = method
+        self.params = params or {}
+        self.coeffs = []
+        self.laguerre_poly = []
+        self._init_polynomials()
+        self._calculate_coefficients()
+
+    def _init_polynomials(self):
+        for n in range(self.degree + 1):
+            self.laguerre_poly.append(laguerre_coeffs(n))
+
+    def _calculate_coefficients(self):
+        global integral
+        self.coeffs = []
+        for k in range(self.degree + 1):
+            Lk = self.laguerre_poly[k]
+
+            def integrand(x):
+                return self.func(x) * polynomial(x, Lk)
+
+            if self.method == 'gauss':
+                integral = self.integrator.gauss_quadrature(
+                    integrand,
+                    self.params.get('n_points', 5)
+                )
+            elif self.method == 'simpson':
+                integral = self.integrator.newton_cotes_adaptive(integrand,
+                    self.params.get('tol', 1e-8)
+                )
+
+            norm = factorial(k) ** 2
+            self.coeffs.append(integral / norm)
+
+    def evaluate(self, x):
+        result = 0.0
+        for k in range(self.degree + 1):
+            result += self.coeffs[k] * polynomial(x, self.laguerre_poly[k])
+        return result
+
+    def calculate_error(self):
+        if self.method == 'gauss':
+            integral = self.integrator.gauss_quadrature(
+                lambda x: (self.func(x) - self.evaluate(x)) ** 2,
+                self.params.get('n_points', 5)
+            )
+        else:
+            integral = self.integrator.newton_cotes_adaptive(
+                lambda x: (self.func(x) - self.evaluate(x)) ** 2,
+                self.params.get('tol', 1e-8))
+
+        return numpy.sqrt(abs(integral))
