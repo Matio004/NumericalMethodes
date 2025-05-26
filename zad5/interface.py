@@ -13,7 +13,7 @@ def main():
 
     FUNCTION_LIBRARY = [
         (lambda x: 2 * x + 3, "Liniowa: 2x + 3"),
-        (lambda x: np.abs(x), "Wartość bezwzględna: |x|"),
+        (lambda x: np.abs(x-4), "Wartość bezwzględna: |x - 4|"),
         (lambda x: polynomial(x, [1, 0, -2, 5]), "Wielomian: x³ - 2x + 5"),
         (lambda x: np.sin(x), "Trygonometryczna: sin(x)"),
         (lambda x: np.exp(-x / 3), "Wykładnicza: e^(-x/3)"),
