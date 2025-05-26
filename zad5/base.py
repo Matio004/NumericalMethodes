@@ -1,7 +1,6 @@
 import re
-
-import numpy
-from math import exp, comb, factorial
+import numpy as np
+from math import exp, factorial, gamma
 
 
 class NumericalIntegration:
@@ -9,7 +8,6 @@ class NumericalIntegration:
         self.laguerre_weights = {}
         self.laguerre_roots = {}
 
-        # Dla wielomianów Laguerre'a ([0,∞)) z wagą e^(-x)
         with open(filepath, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
@@ -24,9 +22,8 @@ class NumericalIntegration:
             match = re.match(r'n\s*=\s*(\d+)', line)
             if match:
                 if n is not None:
-                    # Zapisz poprzednie dane
-                    self.laguerre_weights[n] = numpy.array(weights)
-                    self.laguerre_roots[n] = numpy.array(roots)
+                    self.laguerre_weights[n] = np.array(weights)
+                    self.laguerre_roots[n] = np.array(roots)
                     weights = []
                     roots = []
                 n = int(match.group(1))
@@ -38,21 +35,17 @@ class NumericalIntegration:
                     weights.append(weight)
                     roots.append(root)
 
-        # Zapisz dane dla ostatniego n
         if n is not None and weights and roots:
-            self.laguerre_weights[n] = numpy.array(weights)
-            self.laguerre_roots[n] = numpy.array(roots)
+            self.laguerre_weights[n] = np.array(weights)
+            self.laguerre_roots[n] = np.array(roots)
 
     def simpson_rule(self, f, a, b, n):
-        """
-        Implementacja reguły Simpsona (złożona kwadratura Newtona-Cotesa oparta na trzech węzłach)
-        """
-        if n % 2 == 1:  # n musi być parzyste
+        if n % 2 == 1:
             n += 1
 
         h = (b - a) / n
-        x = numpy.linspace(a, b, n + 1)
-        y = numpy.array([f(xi) for xi in x])
+        x = np.linspace(a, b, n + 1)
+        y = np.array([f(xi) for xi in x])
 
         result = y[0] + y[-1]
         result += 4 * sum(y[1:-1:2])
@@ -62,50 +55,35 @@ class NumericalIntegration:
         return result
 
     def newton_cotes_adaptive(self, f, tol=1e-6):
-        """
-        Adaptacyjna złożona kwadratura Newtona-Cotesa dla wariantu 3
-        Całkowanie na [0, +∞) z wagą e^(-x)
-        """
+        a, b = 0, 5
+        n = 20
 
-        # Obliczanie całki na [0, a] i granicy dla [a, +∞)
-        return self._compute_boundary_limits_variant3(f, tol)
-
-    def _compute_boundary_limits_variant3(self, f, tol):
-        """
-        Obliczanie całki na [0, +∞) z wagą e^(-x)
-        """
-        # Zaczynamy od przedziału [0, 10] i rozszerzamy granicę w razie potrzeby
-        a, b = 0, 10
-        n = 10
         prev_result = self.simpson_rule(lambda x: f(x) * exp(-x), a, b, n)
 
-        while True:
+        for _ in range(10):
             n *= 2
             current_result = self.simpson_rule(lambda x: f(x) * exp(-x), a, b, n)
             if abs(current_result - prev_result) < tol:
-                result = current_result
                 break
             prev_result = current_result
 
-        # Sprawdzamy czy potrzebujemy rozszerzyć granicę
-        b_ext = 20
-        extension_result = self.simpson_rule(lambda x: f(x) * exp(-x), b, b_ext, n)
-        while abs(extension_result) > tol / 10:
-            result += extension_result
+        result = current_result
+
+        while b < 50:
+            b_ext = min(b + 10, 50)
+            extension = self.simpson_rule(lambda x: f(x) * exp(-x), b, b_ext, n // 2)
+            if abs(extension) < tol * 0.01:
+                break
+            result += extension
             b = b_ext
-            b_ext = 2 * b
-            extension_result = self.simpson_rule(lambda x: f(x) * exp(-x), b, b_ext, n)
 
         return result
 
-    def gauss_quadrature(self, f, n_points=3):
-        """
-        Kwadratura Gaussa dla wariantu 3
-        Całkowanie na [0, +∞) z wagą e^(-x)
-        """
+    def gauss_quadrature(self, f, n_points=5):
+        if n_points not in self.laguerre_roots:
+            available = list(self.laguerre_roots.keys())
+            n_points = min(available, key=lambda x: abs(x - n_points))
 
-
-        # Dla wielomianów Laguerre'a waga jest już uwzględniona w metodzie
         roots = self.laguerre_roots[n_points]
         weights = self.laguerre_weights[n_points]
         result = sum(weights[i] * f(roots[i]) for i in range(n_points))
@@ -113,32 +91,28 @@ class NumericalIntegration:
         return result
 
 
-def polynomial(x, args):
-    """
+def polynomial(x, coeffs):
+    if not coeffs:
+        return 0.0
 
-    :param x:
-    :param args: kolejność współczynników [ax^n, ax^n-1, ..., a]
-    :return:
-    """
-    y = 0
-
-    for i in args:
-        y = y*x + i
-    return y
+    result = coeffs[0]
+    for coeff in coeffs[1:]:
+        result = result * x + coeff
+    return result
 
 
 def poly_add(p1, p2):
     max_len = max(len(p1), len(p2))
-    p1 += [0] * (max_len - len(p1))
-    p2 += [0] * (max_len - len(p2))
-    return [a + b for a, b in zip(p1, p2)]
+    p1_ext = [0] * (max_len - len(p1)) + p1
+    p2_ext = [0] * (max_len - len(p2)) + p2
+    return [a + b for a, b in zip(p1_ext, p2_ext)]
 
 
 def poly_sub(p1, p2):
     max_len = max(len(p1), len(p2))
-    p1 += [0] * (max_len - len(p1))
-    p2 += [0] * (max_len - len(p2))
-    return [a - b for a, b in zip(p1, p2)]
+    p1_ext = [0] * (max_len - len(p1)) + p1
+    p2_ext = [0] * (max_len - len(p2)) + p2
+    return [a - b for a, b in zip(p1_ext, p2_ext)]
 
 
 def poly_mul_scalar(p, scalar):
@@ -146,27 +120,47 @@ def poly_mul_scalar(p, scalar):
 
 
 def poly_mul_x(p):
-    return [0] + p
+    return p + [0]
 
 
 def laguerre_coeffs(n):
-
-    L0 = [1]  # L_0(x) = 1
     if n == 0:
-        return L0
-    L1 = [-1, 1]  # L_1(x) = x - 1
-    if n == 1:
-        return L1
+        return [1]  # L_0(x) = 1
+    elif n == 1:
+        return [-1, 1]  # L_1(x) = -x + 1 = 1 - x
+
+    # L_0 i L_1
+    L_prev_prev = [1]  # L_0
+    L_prev = [-1, 1]  # L_1
 
     for k in range(1, n):
-        # (x - 2k - 1) * Lk = x * Lk - (2k + 1) * Lk
-        xLk = poly_mul_x(L1)
-        term1 = poly_sub(xLk, poly_mul_scalar(L1, 2 * k + 1))
-        term2 = poly_mul_scalar(L0, k * k)
-        L2 = poly_sub(term1, term2)
-        L0, L1 = L1, L2
+        # (k+1)*L_{k+1}(x) = (2k+1-x)*L_k(x) - k*L_{k-1}(x)
 
-    return L1
+        # (2k+1)*L_k(x)
+        term1 = poly_mul_scalar(L_prev, 2 * k + 1)
+
+        # -x*L_k(x)
+        term2 = poly_mul_x(L_prev)
+        term2 = poly_mul_scalar(term2, -1)
+
+        # (2k+1-x)*L_k(x)
+        combined = poly_add(term1, term2)
+
+        # -k*L_{k-1}(x)
+        term3 = poly_mul_scalar(L_prev_prev, -k)
+
+        # Całe wyrażenie
+        L_current = poly_add(combined, term3)
+
+        # Dzielenie przez (k+1)
+        L_current = poly_mul_scalar(L_current, 1.0 / (k + 1))
+
+        # Przesunięcie dla następnej iteracji
+        L_prev_prev = L_prev
+        L_prev = L_current
+
+    return L_prev
+
 
 class Approximation:
     def __init__(self, func, degree, integrator, method='gauss', params=None):
@@ -181,46 +175,67 @@ class Approximation:
         self._calculate_coefficients()
 
     def _init_polynomials(self):
+        self.laguerre_poly = []
         for n in range(self.degree + 1):
             self.laguerre_poly.append(laguerre_coeffs(n))
 
     def _calculate_coefficients(self):
-        global integral
         self.coeffs = []
+
         for k in range(self.degree + 1):
-            Lk = self.laguerre_poly[k]
+            Lk_coeffs = self.laguerre_poly[k]
 
             def integrand(x):
-                return self.func(x) * polynomial(x, Lk)
+                return self.func(x) * polynomial(x, Lk_coeffs)
 
+            # Oblicz <f, L_k>
             if self.method == 'gauss':
-                integral = self.integrator.gauss_quadrature(
+                numerator = self.integrator.gauss_quadrature(
                     integrand,
-                    self.params.get('n_points', 5)
+                    self.params.get('n_points', 7)
                 )
-            elif self.method == 'simpson':
-                integral = self.integrator.newton_cotes_adaptive(integrand,
+            else:
+                numerator = self.integrator.newton_cotes_adaptive(
+                    integrand,
                     self.params.get('tol', 1e-8)
                 )
 
-            norm = factorial(k) ** 2
-            self.coeffs.append(integral / norm)
+            denominator = factorial(k)
+
+            self.coeffs.append(numerator / denominator)
 
     def evaluate(self, x):
         result = 0.0
         for k in range(self.degree + 1):
-            result += self.coeffs[k] * polynomial(x, self.laguerre_poly[k])
+            Lk_value = polynomial(x, self.laguerre_poly[k])
+            result += self.coeffs[k] * Lk_value
         return result
 
     def calculate_error(self):
+
+        def error_integrand(x):
+            diff = self.func(x) - self.evaluate(x)
+            return diff * diff
+
         if self.method == 'gauss':
             integral = self.integrator.gauss_quadrature(
-                lambda x: (self.func(x) - self.evaluate(x)) ** 2,
-                self.params.get('n_points', 5)
+                error_integrand,
+                self.params.get('n_points', 7)
             )
         else:
             integral = self.integrator.newton_cotes_adaptive(
-                lambda x: (self.func(x) - self.evaluate(x)) ** 2,
-                self.params.get('tol', 1e-8))
+                error_integrand,
+                self.params.get('tol', 1e-8)
+            )
 
-        return numpy.sqrt(abs(integral))
+        return np.sqrt(abs(integral))
+
+    def get_polynomial_coeffs(self):
+        result_poly = [0]
+
+        for k in range(self.degree + 1):
+            Lk_coeffs = self.laguerre_poly[k]
+            scaled_Lk = poly_mul_scalar(Lk_coeffs, self.coeffs[k])
+            result_poly = poly_add(result_poly, scaled_Lk)
+
+        return result_poly
